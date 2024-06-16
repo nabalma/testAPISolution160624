@@ -56,7 +56,7 @@ jobs:
       Solution_Name: testAPISolution.sln
       Test_Project_Path: your-test-project-path
       Wap_Project_Directory: testAPISolution.testAPI20240616Project
-      Wap_Project_Path: testAPISolution.testAPI20240616Project.csproj
+      Wap_Project_Path: testAPISolution/testAPI20240616Project/testAPI20240616Project.csproj
       CertificatePath: GitHubActionsWorkflow.pfx
 
     steps:
@@ -97,7 +97,11 @@ jobs:
       shell: pwsh
 
     - name: Create the app package
-      run: msbuild $env:Wap_Project_Path /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=$certificatePath /p:PackageCertificatePassword=${{ secrets.Pfx_Key }}
+      run: |
+        $absoluteProjectPath = Join-Path -Path "${{ github.workspace }}" -ChildPath $env:Wap_Project_Path
+        Write-Host "Building project at path: $absoluteProjectPath"
+        msbuild $absoluteProjectPath /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=$certificatePath /p:PackageCertificatePassword=${{ secrets.Pfx_Key }}
+      shell: pwsh
       env:
         Appx_Bundle: Always
         Appx_Bundle_Platforms: x86|x64
