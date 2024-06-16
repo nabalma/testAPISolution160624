@@ -94,11 +94,19 @@ jobs:
       run: |
         echo "Listing files in the working directory"
         Get-ChildItem -Path "${{ github.workspace }}" -Recurse
+        echo "Displaying absolute project path"
+        $absoluteProjectPath = Join-Path -Path "${{ github.workspace }}" -ChildPath "$env:Wap_Project_Path"
+        Write-Host "Absolute project path: $absoluteProjectPath"
+        if (Test-Path $absoluteProjectPath) {
+          Write-Host "Project file exists"
+        } else {
+          Write-Host "Project file does NOT exist"
+        }
       shell: pwsh
 
     - name: Create the app package
       run: |
-        $absoluteProjectPath = Join-Path -Path "${{ github.workspace }}" -ChildPath $env:Wap_Project_Path
+        $absoluteProjectPath = Join-Path -Path "${{ github.workspace }}" -ChildPath "$env:Wap_Project_Path"
         Write-Host "Building project at path: $absoluteProjectPath"
         msbuild $absoluteProjectPath /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=$certificatePath /p:PackageCertificatePassword=${{ secrets.Pfx_Key }}
       shell: pwsh
