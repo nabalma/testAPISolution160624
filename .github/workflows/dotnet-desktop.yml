@@ -103,9 +103,9 @@ jobs:
 
     - name: Create the app package
       run: |
-        $absoluteProjectPath = Join-Path -Path "${{ github.workspace }}" -ChildPath "$env:Wap_Project_Path"
-        Write-Host "Building project at path: $absoluteProjectPath"
-        msbuild $absoluteProjectPath /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=$certificatePath /p:PackageCertificatePassword=${{ secrets.Pfx_Key }}
+        $env:absoluteProjectPath = Join-Path -Path "${{ github.workspace }}" -ChildPath "$env:Wap_Project_Path"
+        Write-Host "Building project at path: $env:absoluteProjectPath"
+        msbuild $env:absoluteProjectPath /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=$env:certificatePath /p:PackageCertificatePassword=${{ secrets.Pfx_Key }}
       shell: pwsh
       env:
         Appx_Bundle: Always
