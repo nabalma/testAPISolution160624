@@ -56,7 +56,7 @@ jobs:
       Solution_Name: testAPISolution.sln
       Test_Project_Path: your-test-project-path
       Wap_Project_Directory: testAPISolution.testAPI20240616Project
-      Wap_Project_Path: testAPISolution/testAPI20240616Project/testAPI20240616Project.csproj
+      Wap_Project_Path: testAPISolution.testAPI20240616Project.csproj
       CertificatePath: GitHubActionsWorkflow.pfx
 
     steps:
@@ -88,6 +88,12 @@ jobs:
         Write-Host "Writing PFX certificate to path: $certificatePath"
         New-Item -ItemType Directory -Path (Split-Path -Path $certificatePath) -Force
         [IO.File]::WriteAllBytes($certificatePath, $pfx_cert_byte)
+      shell: pwsh
+
+    - name: List files and directories for debugging
+      run: |
+        echo "Listing files in the working directory"
+        Get-ChildItem -Path "${{ github.workspace }}" -Recurse
       shell: pwsh
 
     - name: Create the app package
