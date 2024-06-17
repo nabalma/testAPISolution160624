@@ -56,7 +56,7 @@ jobs:
       Solution_Name: testAPISolution.sln
       Test_Project_Path: your-test-project-path
       Wap_Project_Directory: testAPISolution.testAPI20240616Project
-      Wap_Project_Path: testAPISolution/testAPI20240616Project/testAPI20240616Project.csproj
+      Wap_Project_Path: testAPISolution/testAPI20240616Project/Program.cs
       CertificatePath: GitHubActionsWorkflow.pfx
 
     steps:
