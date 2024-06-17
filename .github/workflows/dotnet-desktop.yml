@@ -55,8 +55,7 @@ jobs:
     env:
       Solution_Name: testAPISolution.sln
       Test_Project_Path: your-test-project-path
-      Wap_Project_Directory: testAPISolution.testAPI20240616Project
-      Wap_Project_Path: testAPISolution/testAPI20240616Project/testAPI20240616Project.csproj
+      Wap_Project_Path: C:\Users\Ousseynou\source\repos\testAPISolution\testAPI20240616Project\testAPI20240616Project.csproj
       CertificatePath: GitHubActionsWorkflow.pfx
 
     steps:
@@ -73,6 +72,9 @@ jobs:
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
 
+    - name: Execute unit tests
+      run: dotnet test
+
     - name: Restore the application
       run: dotnet restore $env:Solution_Name
       env:
@@ -81,31 +83,17 @@ jobs:
     - name: Decode the pfx
       run: |
         $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Base64_Encoded_Pfx }}")
-        $certificatePath = Join-Path -Path "${{ github.workspace }}" -ChildPath "$env:Wap_Project_Directory/$env:CertificatePath"
+        $certificatePath = Join-Path -Path "${{ github.workspace }}" -ChildPath "$env:CertificatePath"
         Write-Host "Writing PFX certificate to path: $certificatePath"
         New-Item -ItemType Directory -Path (Split-Path -Path $certificatePath) -Force
         [IO.File]::WriteAllBytes($certificatePath, $pfx_cert_byte)
       shell: pwsh
 
-    - name: List files and directories for debugging
-      run: |
-        echo "Listing files in the working directory"
-        Get-ChildItem -Path "${{ github.workspace }}" -Recurse
-        echo "Displaying absolute project path"
-        $absoluteProjectPath = Join-Path -Path "${{ github.workspace }}" -ChildPath "$env:Wap_Project_Path"
-        Write-Host "Absolute project path: $absoluteProjectPath"
-        if (Test-Path $absoluteProjectPath) {
-          Write-Host "Project file exists"
-        } else {
-          Write-Host "Project file does NOT exist"
-        }
-      shell: pwsh
-
     - name: Create the app package
       run: |
-        $env:absoluteProjectPath = Join-Path -Path "${{ github.workspace }}" -ChildPath "$env:Wap_Project_Path"
-        Write-Host "Building project at path: $env:absoluteProjectPath"
-        msbuild $env:absoluteProjectPath /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=$env:certificatePath /p:PackageCertificatePassword=${{ secrets.Pfx_Key }}
+        $absoluteProjectPath = "$env:Wap_Project_Path"
+        Write-Host "Building project at path: $absoluteProjectPath"
+        msbuild $absoluteProjectPath /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=$certificatePath /p:PackageCertificatePassword=${{ secrets.Pfx_Key }}
       shell: pwsh
       env:
         Appx_Bundle: Always
@@ -114,10 +102,10 @@ jobs:
         Configuration: ${{ matrix.configuration }}
 
     - name: Remove the pfx
-      run: Remove-Item -path "${{ github.workspace }}\$env:Wap_Project_Directory\$env:CertificatePath"
+      run: Remove-Item -path "${{ github.workspace }}\$env:CertificatePath"
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
         name: MSIX Package
-        path: ${{ env.Wap_Project_Directory }}\AppPackages
+        path: C:\Users\Ousseynou\source\repos\testAPISolution\testAPI20240616Project\AppPackages
